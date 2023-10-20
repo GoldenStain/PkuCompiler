@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include "BaseAST.hpp"
-#include "IRBuild.hpp"
 
 using namespace std;
 
@@ -33,7 +32,9 @@ int main(int argc, const char *argv[]) {
   unique_ptr<BaseAST> ast;
   auto ret = yyparse(ast);
   assert(!ret);
-  IR_Build();
+  freopen(output, "w", stdout);
+  ast->Dump();
+  cout << endl;
   // 输出解析得到的 AST, 其实就是个字符串
   return 0;
 }
