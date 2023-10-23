@@ -1,4 +1,3 @@
-#pragma once
 #ifndef LIBKOOPA_KOOPA_H_
 #define LIBKOOPA_KOOPA_H_
 

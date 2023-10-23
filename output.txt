@@ -1,2 +1,0 @@
-error: syntax error
-compiler: /share/sysy-make-template/src/main.cpp:34: int main(int, const char **): Assertion `!ret' failed.

@@ -1,9 +1,4 @@
-
-
-
-/*fjskldafuoirtweautopwtgj jlkgdf;jdsg l;fgdsujoaifg fj*/
-int main ()
-{return 233;
+int main()
+{
+    return 11;
 }
-
-/*fjskldafuoirtweautopwtgj jlkgdf;jdsg l;fgdsujoaifg fj*/

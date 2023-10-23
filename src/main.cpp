@@ -3,7 +3,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <sstream>
 #include "BaseAST.hpp"
+#include "IRBuild.hpp"
 
 using namespace std;
 
@@ -32,9 +34,26 @@ int main(int argc, const char *argv[]) {
   unique_ptr<BaseAST> ast;
   auto ret = yyparse(ast);
   assert(!ret);
-  freopen(output, "w", stdout);
-  ast->Dump();
-  cout << endl;
+  ostringstream oss;
+  ast->Dump(oss);
+  string Mystr = oss.str();
+  if(!strcmp(mode, "-riscv"))
+  {
+    freopen(output, "w", stdout);
+    const char *myStr = Mystr.c_str();
+    koopa_program_process(myStr);
+  }
+  else if(!strcmp(mode, "-koopa"))
+  {
+    cout << "yes";
+    freopen(output, "w", stdout);
+    cout << Mystr;
+  }
+  else 
+  {
+    cout << "unspecified type" << endl;
+    assert(false);
+  }
   // 输出解析得到的 AST, 其实就是个字符串
   return 0;
 }
