@@ -1,0 +1,7 @@
+mkdir -p /share/sysy-make-template/build/
+clang++ -I/share/sysy-make-template/src -I/share/sysy-make-template/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /share/sysy-make-template/build/sysy.lex.cpp -o /share/sysy-make-template/build/sysy.lex.cpp.o
+mkdir -p /share/sysy-make-template/build/
+clang++ -I/share/sysy-make-template/src -I/share/sysy-make-template/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /share/sysy-make-template/build/sysy.tab.cpp -o /share/sysy-make-template/build/sysy.tab.cpp.o
+mkdir -p /share/sysy-make-template/build/
+clang++ -I/share/sysy-make-template/src -I/share/sysy-make-template/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /share/sysy-make-template/src/main.cpp -o /share/sysy-make-template/build/main.cpp.o
+clang++ /share/sysy-make-template/build/sysy.lex.cpp.o /share/sysy-make-template/build/sysy.tab.cpp.o /share/sysy-make-template/build/main.cpp.o  -L/opt/lib/native -lkoopa -lpthread -ldl -o /share/sysy-make-template/build/compiler
