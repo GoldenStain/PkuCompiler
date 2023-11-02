@@ -280,34 +280,34 @@ typedef struct {
 /// Raw binary operator.
 ///
 enum koopa_raw_binary_op {
-  /// Not equal to.
+  /// Not equal to. 0
   KOOPA_RBO_NOT_EQ,
-  /// Equal to.
+  /// Equal to. 1
   KOOPA_RBO_EQ,
-  /// Greater than.
+  /// Greater than. 2
   KOOPA_RBO_GT,
-  /// Less than.
+  /// Less than. 3
   KOOPA_RBO_LT,
-  /// Greater than or equal to.
+  /// Greater than or equal to. 4
   KOOPA_RBO_GE,
-  /// Less than or equal to.
+  /// Less than or equal to. 5
   KOOPA_RBO_LE,
-  /// Addition.
+  /// Addition. 6
   KOOPA_RBO_ADD,
-  /// Subtraction.
+  /// Subtraction. 7
   KOOPA_RBO_SUB,
-  /// Multiplication.
+  /// Multiplication. 8
   KOOPA_RBO_MUL,
-  /// Division.
+  /// Division. 9 
   KOOPA_RBO_DIV,
-  /// Modulo.
+  /// Modulo. 10
   KOOPA_RBO_MOD,
-  /// Bitwise AND.
+  /// Bitwise AND. 11
   KOOPA_RBO_AND,
-  /// Bitwise OR.
+  /// Bitwise OR. 12
   KOOPA_RBO_OR,
-  /// Bitwise XOR.
-  KOOPA_RBO_XOR,
+  /// Bitwise XOR. 13
+  KOOPA_RBO_XOR, 
   /// Shift left logical.
   KOOPA_RBO_SHL,
   /// Shift right logical.

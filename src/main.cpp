@@ -19,10 +19,11 @@ extern int yyparse(unique_ptr<BaseAST> &ast);
 int cnt, rootnum;
 bool flag;
 
-int main(int argc, const char *argv[]) {
-  //wuce
-  // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
-  // compiler 模式 输入文件 -o 输出文件
+int main(int argc, const char *argv[])
+{
+  // wuce
+  //  解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
+  //  compiler 模式 输入文件 -o 输出文件
   assert(argc == 5);
   auto mode = argv[1];
   auto input = argv[2];
@@ -39,19 +40,19 @@ int main(int argc, const char *argv[]) {
   ostringstream oss;
   ast->Dump(oss);
   string Mystr = oss.str();
-  if(!strcmp(mode, "-riscv"))
+  if (!strcmp(mode, "-riscv"))
   {
     freopen(output, "w", stdout);
     const char *myStr = Mystr.c_str();
     koopa_program_process(myStr);
   }
-  else if(!strcmp(mode, "-koopa"))
+  else if (!strcmp(mode, "-koopa"))
   {
     cout << "yes";
     freopen(output, "w", stdout);
     cout << Mystr;
   }
-  else 
+  else
   {
     cout << "unspecified type" << endl;
     assert(false);

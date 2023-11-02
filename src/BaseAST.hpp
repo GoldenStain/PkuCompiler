@@ -71,6 +71,7 @@ public:
             oss << "ret %" << cnt - 1;
         else
             oss << "ret " << rootnum;
+        oss << "\n";
     }
 };
 
@@ -115,6 +116,7 @@ public:
                 else
                     oss << "%" << cnt - 1 << ", 0";
                 oss << "\n";
+                cnt++;
             }
             if (uop == '-')
             {
@@ -123,11 +125,10 @@ public:
                 if (!cnt)
                     oss << rootnum;
                 else
-                    oss << "%" << cnt;
+                    oss << "%" << cnt - 1;
                 oss << "\n";
+                cnt++;
             }
-
-            cnt++;
         }
         else
             pexp->Dump(oss);
