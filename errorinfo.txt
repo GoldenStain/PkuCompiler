@@ -1,7 +1,116 @@
 mkdir -p /share/sysy-make-template/build/
-clang++ -I/share/sysy-make-template/src -I/share/sysy-make-template/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /share/sysy-make-template/build/sysy.lex.cpp -o /share/sysy-make-template/build/sysy.lex.cpp.o
-mkdir -p /share/sysy-make-template/build/
-clang++ -I/share/sysy-make-template/src -I/share/sysy-make-template/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /share/sysy-make-template/build/sysy.tab.cpp -o /share/sysy-make-template/build/sysy.tab.cpp.o
-mkdir -p /share/sysy-make-template/build/
 clang++ -I/share/sysy-make-template/src -I/share/sysy-make-template/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /share/sysy-make-template/src/main.cpp -o /share/sysy-make-template/build/main.cpp.o
-clang++ /share/sysy-make-template/build/sysy.lex.cpp.o /share/sysy-make-template/build/sysy.tab.cpp.o /share/sysy-make-template/build/main.cpp.o  -L/opt/lib/native -lkoopa -lpthread -ldl -o /share/sysy-make-template/build/compiler
+In file included from /share/sysy-make-template/src/main.cpp:8:
+/share/sysy-make-template/src/IRBuild.hpp:16:40: error: call to implicitly-deleted default constructor of 'unordered_map<koopa_raw_binary_t, int>'
+unordered_map<koopa_raw_binary_t, int> registers;
+                                       ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/unordered_map.h:141:7: note: explicitly defaulted function was implicitly deleted here
+      unordered_map() = default;
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/unordered_map.h:105:18: note: default constructor of 'unordered_map<koopa_raw_binary_t, int>' is implicitly deleted because field '_M_h' has a deleted default constructor
+      _Hashtable _M_h;
+                 ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable.h:438:7: note: explicitly defaulted function was implicitly deleted here
+      _Hashtable() = default;
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable.h:174:7: note: default constructor of '_Hashtable<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::allocator<std::pair<const koopa_raw_binary_t, int>>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true>>' is implicitly deleted because base class '__detail::_Hashtable_base<koopa_raw_binary_t, pair<const koopa_raw_binary_t, int>, _Select1st, equal_to<koopa_raw_binary_t>, hash<koopa_raw_binary_t>, _Mod_range_hashing, _Default_ranged_hash, _Hashtable_traits<true, false, true>>' has a deleted default constructor
+    : public __detail::_Hashtable_base<_Key, _Value, _ExtractKey, _Equal,
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1822:5: note: explicitly defaulted function was implicitly deleted here
+    _Hashtable_base() = default;
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1771:5: note: default constructor of '_Hashtable_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Hashtable_traits<true, false, true>>' is implicitly deleted because base class '_Hash_code_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::__detail::_Select1st, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, _Hashtable_traits<true, false, true>::__hash_cached::value>' has a deleted default constructor
+  : public _Hash_code_base<_Key, _Value, _ExtractKey, _H1, _H2, _Hash,
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1373:7: note: explicitly defaulted function was implicitly deleted here
+      _Hash_code_base() = default;
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1349:7: note: default constructor of '_Hash_code_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::__detail::_Select1st, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, true>' is implicitly deleted because base class '_Hashtable_ebo_helper<1, std::hash<koopa_raw_binary_t>>' has a deleted default constructor
+      private _Hashtable_ebo_helper<1, _H1>,
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1096:7: note: explicitly defaulted function was implicitly deleted here
+      _Hashtable_ebo_helper() = default;
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1094:7: note: default constructor of '_Hashtable_ebo_helper<1, std::hash<koopa_raw_binary_t>, true>' is implicitly deleted because base class 'std::hash<koopa_raw_binary_t>' has a deleted default constructor
+    : private _Tp
+      ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/functional_hash.h:101:19: note: default constructor of 'hash<koopa_raw_binary_t>' is implicitly deleted because base class '__hash_enum<koopa_raw_binary_t>' has no default constructor
+    struct hash : __hash_enum<_Tp>
+                  ^
+In file included from /share/sysy-make-template/src/main.cpp:7:
+In file included from /share/sysy-make-template/src/BaseAST.hpp:5:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/unordered_map:46:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable.h:35:
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1382:2: error: static_assert failed due to requirement 'std::__is_invocable<const std::hash<koopa_raw_binary_t> &, const koopa_raw_binary_t &>{}' "hash function must be invocable with an argument of key type"
+        static_assert(__is_invocable<const _H1&, const _Key&>{},
+        ^             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:695:33: note: in instantiation of member function 'std::__detail::_Hash_code_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::__detail::_Select1st, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, true>::_M_hash_code' requested here
+      __hash_code __code = __h->_M_hash_code(__k);
+                                ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/unordered_map.h:986:16: note: in instantiation of member function 'std::__detail::_Map_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::allocator<std::pair<const koopa_raw_binary_t, int>>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true>, true>::operator[]' requested here
+      { return _M_h[__k]; }
+               ^
+/share/sysy-make-template/src/IRBuild.hpp:130:31: note: in instantiation of member function 'std::unordered_map<koopa_raw_binary_t, int>::operator[]' requested here
+    else l_reg_idx = registers[L->kind.data.binary];
+                              ^
+In file included from /share/sysy-make-template/src/main.cpp:7:
+In file included from /share/sysy-make-template/src/BaseAST.hpp:5:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/unordered_map:46:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable.h:35:
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1384:9: error: type 'const std::hash<koopa_raw_binary_t>' does not provide a call operator
+        return _M_h1()(__k);
+               ^~~~~~~
+In file included from /share/sysy-make-template/src/main.cpp:3:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/iostream:39:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/ostream:38:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/ios:42:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/ios_base.h:41:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/locale_classes.h:40:
+In file included from /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/string:48:
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_function.h:356:20: error: invalid operands to binary expression ('const koopa_raw_binary_t' and 'const koopa_raw_binary_t')
+      { return __x == __y; }
+               ~~~ ^  ~~~
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1450:42: note: in instantiation of member function 'std::equal_to<koopa_raw_binary_t>::operator()' requested here
+    { return __c == __n->_M_hash_code && __eq(__k, __extract(__n->_M_v())); }
+                                         ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:1834:28: note: in instantiation of member function 'std::__detail::_Equal_helper<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, unsigned long, true>::_S_equals' requested here
+      return _EqualHelper::_S_equals(_M_eq(), this->_M_extract(),
+                           ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable.h:1580:14: note: in instantiation of member function 'std::__detail::_Hashtable_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Hashtable_traits<true, false, true>>::_M_equals' requested here
+          if (this->_M_equals(__k, __code, __p))
+                    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable.h:687:28: note: in instantiation of member function 'std::_Hashtable<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::allocator<std::pair<const koopa_raw_binary_t, int>>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true>>::_M_find_before_node' requested here
+        __node_base* __before_n = _M_find_before_node(__bkt, __key, __c);
+                                  ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/hashtable_policy.h:697:31: note: in instantiation of member function 'std::_Hashtable<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::allocator<std::pair<const koopa_raw_binary_t, int>>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true>>::_M_find_node' requested here
+      __node_type* __p = __h->_M_find_node(__n, __k, __code);
+                              ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/unordered_map.h:986:16: note: in instantiation of member function 'std::__detail::_Map_base<koopa_raw_binary_t, std::pair<const koopa_raw_binary_t, int>, std::allocator<std::pair<const koopa_raw_binary_t, int>>, std::__detail::_Select1st, std::equal_to<koopa_raw_binary_t>, std::hash<koopa_raw_binary_t>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true>, true>::operator[]' requested here
+      { return _M_h[__k]; }
+               ^
+/share/sysy-make-template/src/IRBuild.hpp:130:31: note: in instantiation of member function 'std::unordered_map<koopa_raw_binary_t, int>::operator[]' requested here
+    else l_reg_idx = registers[L->kind.data.binary];
+                              ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/postypes.h:222:5: note: candidate template ignored: could not match 'fpos<type-parameter-0-0>' against 'const koopa_raw_binary_t'
+    operator==(const fpos<_StateT>& __lhs, const fpos<_StateT>& __rhs)
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_pair.h:448:5: note: candidate template ignored: could not match 'pair<type-parameter-0-0, type-parameter-0-1>' against 'const koopa_raw_binary_t'
+    operator==(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_iterator.h:325:5: note: candidate template ignored: could not match 'reverse_iterator<type-parameter-0-0>' against 'const koopa_raw_binary_t'
+    operator==(const reverse_iterator<_Iterator>& __x,
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_iterator.h:363:5: note: candidate template ignored: could not match 'reverse_iterator<type-parameter-0-0>' against 'const koopa_raw_binary_t'
+    operator==(const reverse_iterator<_IteratorL>& __x,
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_iterator.h:1136:5: note: candidate template ignored: could not match 'move_iterator<type-parameter-0-0>' against 'const koopa_raw_binary_t'
+    operator==(const move_iterator<_IteratorL>& __x,
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_iterator.h:1142:5: note: candidate template ignored: could not match 'move_iterator<type-parameter-0-0>' against 'const koopa_raw_binary_t'
+    operator==(const move_iterator<_Iterator>& __x,
+    ^
+/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/allocator.h:167:5: note: candidate template ignored: could not match 'allocator<type-parameter-0-0>' against 'const koopa_raw_binary_t'
+    operator==(const allocator<_T1>&, const allocator<_T2>&)
+    ^
+4 errors generated.
+make: *** [Makefile:83: /share/sysy-make-template/build/main.cpp.o] Error 1

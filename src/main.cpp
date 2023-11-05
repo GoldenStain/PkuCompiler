@@ -17,11 +17,16 @@ using namespace std;
 extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 int cnt, rootnum;
-bool flag;
+
+unordered_map<char, std::string> addops, mulops;
 
 int main(int argc, const char *argv[])
 {
-  // wuce
+  addops['+'] = "add";
+  addops['-'] = "sub";
+  mulops['*'] = "mul";
+  mulops['/'] = "div";
+  mulops['%'] = "mod";
   //  解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
   //  compiler 模式 输入文件 -o 输出文件
   assert(argc == 5);

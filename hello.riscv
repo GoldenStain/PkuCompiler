@@ -1,10 +1,11 @@
    .text
    .globl main
 main:
-	li	t0, 6
-	xor	t0, t0, x0
-	seqz	t0, t0
-	sub	t1, x0, t0
-	sub	t2, x0, t1
+	li	t0, 3
+	sub	t0, x0, t0
+	li	t1, 2
+	mul	t1, t1, t0
+	li	t2, 1
+	add	t2, t2, t1
 	mv	a0, t2
 	ret

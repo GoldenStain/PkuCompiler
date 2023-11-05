@@ -43,7 +43,7 @@ using namespace std;
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
-%type <ast_val> FuncDef FuncType Block Stmt Exp PrimaryExp UnaryExp
+%type <ast_val> FuncDef FuncType Block Stmt Exp PrimaryExp UnaryExp MulExp
 %type <int_val> Number
 
 %%
@@ -106,10 +106,47 @@ Stmt
   }
   ;
 
-Exp
+MulExp
   : UnaryExp {
-    auto ast = new ExpAST();
+    auto ast = new MulExpAST();
     ast->uexp = unique_ptr<BaseAST>($1);
+    $$ = ast;
+  } | MulExp '*' UnaryExp {
+    auto ast = new MulExpAST();
+    ast->mexp = unique_ptr<BaseAST>($1);
+    ast->mop = '*';
+    ast->uexp = unique_ptr<BaseAST>($3);
+    $$ = ast;
+  } | MulExp '/' UnaryExp {
+    auto ast = new MulExpAST();
+    ast->mexp = unique_ptr<BaseAST>($1);
+    ast->mop = '/';
+    ast->uexp = unique_ptr<BaseAST>($3);
+    $$ = ast;
+  } | MulExp '%' UnaryExp {
+    auto ast = new MulExpAST();
+    ast->mexp = unique_ptr<BaseAST>($1);
+    ast->mop = '%';
+    ast->uexp = unique_ptr<BaseAST>($3);
+    $$ = ast;
+  }
+
+Exp
+  : MulExp {
+    auto ast = new ExpAST();
+    ast->mexp = unique_ptr<BaseAST>($1);
+    $$ = ast;
+  } | Exp '+' MulExp {
+    auto ast = new ExpAST();
+    ast->aop = '+';
+    ast->mexp = unique_ptr<BaseAST>($3);
+    ast->exp = unique_ptr<BaseAST>($1);
+    $$ = ast;
+  } | Exp '-' MulExp {
+    auto ast = new ExpAST();
+    ast->aop = '-';
+    ast->mexp = unique_ptr<BaseAST>($3);
+    ast->exp = unique_ptr<BaseAST>($1);
     $$ = ast;
   }
 
