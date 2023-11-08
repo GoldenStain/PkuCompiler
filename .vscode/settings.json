@@ -27,6 +27,9 @@
         "utility": "cpp",
         "typeinfo": "cpp",
         "sstream": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "fstream": "cpp"
     }
 }

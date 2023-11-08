@@ -11,10 +11,9 @@ typedef unsigned long long ull;
 std::string reg_names[15] = {"t0", "t1", "t2", "t3", "t4", "t5", "t6",
                              "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"};
 
-std::unordered_map<ull, int> registers;
+extern std::unordered_map<ull, int> registers;
 
 int now_using_reg = 0;
-bool is_single_num = 1;
 
 void Visit(const koopa_raw_program_t &program);
 void Visit(const koopa_raw_slice_t &slice);
@@ -101,18 +100,15 @@ void Visit(const koopa_raw_value_t &value)
 void Visit(const koopa_raw_return_t &ret)
 {
     // 不确定是否正确
-    if (is_single_num)
+    if (ret.value->kind.tag == KOOPA_RVT_INTEGER)
     {
         Visit(ret.value);
-        cout << "\tret";
     }
-    else
-    {
-        if (reg_names[now_using_reg - 1] != "a0")
-            cout << "\tmv\t"
-                 << "a0, " << reg_names[now_using_reg - 1] << "\n";
-        cout << "\tret";
-    }
+    int now_number = max(now_using_reg - 1, 0);
+    if (reg_names[now_number] != "a0")
+        cout << "\tmv\t"
+             << "a0, " << reg_names[now_number] << "\n";
+    cout << "\tret";
 }
 
 void get_both(const koopa_raw_value_t &L, const koopa_raw_value_t &R, int &l_reg_idx, int &r_reg_idx)
@@ -144,6 +140,9 @@ void get_both(const koopa_raw_value_t &L, const koopa_raw_value_t &R, int &l_reg
 
     else
         r_reg_idx = registers[(ull)ptr];
+
+    if(L->kind.tag == 0 && R->kind.tag == 0) 
+     now_using_reg++;
 }
 
 void CalPrint(const int &l, const int &r)
@@ -155,48 +154,109 @@ void CalPrint(const int &l, const int &r)
 
 void Visit(const koopa_raw_binary_t &bny)
 {
-    is_single_num = 0;
     koopa_raw_value_t L = bny.lhs, R = bny.rhs;
     int l_reg_idx, r_reg_idx;
+    int now_number;
     switch (bny.op)
     {
     case KOOPA_RBO_EQ:
         get_both(L, R, l_reg_idx, r_reg_idx);
-        cout << "\txor\t" << reg_names[now_using_reg - 1] << ", ";
+        now_number = max(0, now_using_reg - 1);
+        cout << "\txor\t" << reg_names[now_number] << ", ";
         CalPrint(l_reg_idx, r_reg_idx);
-        cout << "\tseqz\t" << reg_names[now_using_reg - 1] << ", " << reg_names[now_using_reg - 1] << "\n";
+        cout << "\tseqz\t" << reg_names[now_number] << ", " << reg_names[now_number] << "\n";
         // 运算完之后不用++，这里是直接覆盖，而不是再开一个新寄存器
         break;
     case KOOPA_RBO_SUB:
         get_both(L, R, l_reg_idx, r_reg_idx);
-        cout << "\tsub\t" << reg_names[now_using_reg - 1] << ", ";
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tsub\t" << reg_names[now_number] << ", ";
         CalPrint(l_reg_idx, r_reg_idx);
         break;
     case KOOPA_RBO_ADD:
         get_both(L, R, l_reg_idx, r_reg_idx);
-        cout << "\tadd\t" << reg_names[now_using_reg - 1] << ", ";
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tadd\t" << reg_names[now_number] << ", ";
         CalPrint(l_reg_idx, r_reg_idx);
         break;
     case KOOPA_RBO_MUL:
         get_both(L, R, l_reg_idx, r_reg_idx);
-        cout << "\tmul\t" << reg_names[now_using_reg - 1] << ", ";
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tmul\t" << reg_names[now_number] << ", ";
         CalPrint(l_reg_idx, r_reg_idx);
         break;
     case KOOPA_RBO_DIV:
         get_both(L, R, l_reg_idx, r_reg_idx);
-        cout << "\tdiv\t" << reg_names[now_using_reg - 1] << ", ";
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tdiv\t" << reg_names[now_number] << ", ";
         CalPrint(l_reg_idx, r_reg_idx);
         break;
     case KOOPA_RBO_MOD:
         get_both(L, R, l_reg_idx, r_reg_idx);
-        cout << "\tmod\t" << reg_names[now_using_reg - 1] << ", ";
+        now_number = max(0, now_using_reg - 1);
+        cout << "\trem\t" << reg_names[now_number] << ", ";
         CalPrint(l_reg_idx, r_reg_idx);
         break;
+    case KOOPA_RBO_OR:
+        get_both(L, R, l_reg_idx, r_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tor\t" << reg_names[now_number] << ", ";
+        CalPrint(l_reg_idx, r_reg_idx);
+        break;
+    case KOOPA_RBO_AND:
+        get_both(L, R, l_reg_idx, r_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tand\t" << reg_names[now_number] << ", ";
+        CalPrint(l_reg_idx, r_reg_idx);
+        break;
+    case KOOPA_RBO_NOT_EQ:
+        get_both(L, R, l_reg_idx, r_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        cout << "\txor\t" << reg_names[now_number] << ", ";
+        CalPrint(l_reg_idx, r_reg_idx);
+        cout << "\tsnez\t" << reg_names[now_number] << ", " << reg_names[now_number] << "\n";
+        break;
+    case KOOPA_RBO_LT:
+        get_both(L, R, l_reg_idx, r_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tslt\t" << reg_names[now_number] << ", ";
+        CalPrint(l_reg_idx, r_reg_idx);
+        break;
+    case KOOPA_RBO_LE:
+    {
+        get_both(L, R, l_reg_idx, r_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        string rr = (r_reg_idx == -1) ? "x0" : reg_names[r_reg_idx];
+        string lr = (l_reg_idx == -1) ? "x0" : reg_names[l_reg_idx];
+        cout << "\tadd\t" << reg_names[now_number] << ", " << reg_names[r_reg_idx] << ", 1"
+             << "\n";
+        cout << "\tslt\t" << reg_names[now_number] << ", " << lr << ", " << reg_names[now_number] << "\n";
+    }
+    break;
+    case KOOPA_RBO_GT:
+    {
+        get_both(L, R, l_reg_idx, r_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        cout << "\tslt\t" << reg_names[now_number] << ", ";
+        CalPrint(r_reg_idx, l_reg_idx);
+    }
+    break;
+    case KOOPA_RBO_GE:
+    {
+        get_both(R, L, r_reg_idx, l_reg_idx);
+        now_number = max(0, now_using_reg - 1);
+        string rr = (r_reg_idx == -1) ? "x0" : reg_names[r_reg_idx];
+        string lr = (l_reg_idx == -1) ? "x0" : reg_names[l_reg_idx];
+        cout << "\tadd\t" << reg_names[now_number] << ", " << reg_names[l_reg_idx] << ", 1"
+             << "\n";
+        cout << "\tslt\t" << reg_names[now_number] << ", " << rr << ", " << reg_names[now_number] << "\n";
+    }
+    break;
     default:
         assert(false);
     }
     const koopa_raw_binary_t *ptr = &bny;
-    registers[(ull)ptr] = now_using_reg - 1;
+    registers[(ull)ptr] = now_number;
 }
 
 void Visit(const koopa_raw_integer_t &intval)

@@ -18,15 +18,23 @@ extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 int cnt, rootnum;
 
-unordered_map<char, std::string> addops, mulops;
+unordered_map<char, string> ops;
+unordered_map<string, string> doubleops;
+unordered_map<ull, int> registers;
 
 int main(int argc, const char *argv[])
 {
-  addops['+'] = "add";
-  addops['-'] = "sub";
-  mulops['*'] = "mul";
-  mulops['/'] = "div";
-  mulops['%'] = "mod";
+  ops['+'] = "add";
+  ops['-'] = "sub";
+  ops['*'] = "mul";
+  ops['/'] = "div";
+  ops['%'] = "mod";
+  doubleops["=="] = "eq";
+  doubleops["!="] = "ne";
+  doubleops[">"] = "gt";
+  doubleops["<"] = "lt";
+  doubleops[">="] = "ge";
+  doubleops["<="] = "le";
   //  解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
   //  compiler 模式 输入文件 -o 输出文件
   assert(argc == 5);

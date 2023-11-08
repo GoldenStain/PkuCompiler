@@ -487,7 +487,8 @@ using namespace std;
 /* 空白符和注释 */
 /* 标识符 */
 /* 整数字面量 */
-#line 491 "/share/sysy-make-template/build/sysy.lex.cpp"
+/* 双字符运算符 */
+#line 492 "/share/sysy-make-template/build/sysy.lex.cpp"
 
 #define INITIAL 0
 
@@ -702,9 +703,9 @@ YY_DECL
 		}
 
 	{
-#line 28 "/share/sysy-make-template/src/sysy.l"
+#line 29 "/share/sysy-make-template/src/sysy.l"
 
-#line 708 "/share/sysy-make-template/build/sysy.lex.cpp"
+#line 709 "/share/sysy-make-template/build/sysy.lex.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -764,61 +765,61 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 29 "/share/sysy-make-template/src/sysy.l"
+#line 30 "/share/sysy-make-template/src/sysy.l"
 { /* 忽略, 不做任何操作 */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 30 "/share/sysy-make-template/src/sysy.l"
+#line 31 "/share/sysy-make-template/src/sysy.l"
 { /* 忽略, 不做任何操作 */ }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 31 "/share/sysy-make-template/src/sysy.l"
+#line 32 "/share/sysy-make-template/src/sysy.l"
 { }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 33 "/share/sysy-make-template/src/sysy.l"
+#line 34 "/share/sysy-make-template/src/sysy.l"
 { return INT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 34 "/share/sysy-make-template/src/sysy.l"
+#line 35 "/share/sysy-make-template/src/sysy.l"
 { return RETURN; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 36 "/share/sysy-make-template/src/sysy.l"
+#line 39 "/share/sysy-make-template/src/sysy.l"
 { yylval.str_val = new string(yytext); return IDENT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 38 "/share/sysy-make-template/src/sysy.l"
+#line 42 "/share/sysy-make-template/src/sysy.l"
 { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 39 "/share/sysy-make-template/src/sysy.l"
+#line 43 "/share/sysy-make-template/src/sysy.l"
 { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 40 "/share/sysy-make-template/src/sysy.l"
+#line 44 "/share/sysy-make-template/src/sysy.l"
 { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 43 "/share/sysy-make-template/src/sysy.l"
+#line 46 "/share/sysy-make-template/src/sysy.l"
 { return yytext[0]; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 45 "/share/sysy-make-template/src/sysy.l"
+#line 48 "/share/sysy-make-template/src/sysy.l"
 ECHO;
 	YY_BREAK
-#line 822 "/share/sysy-make-template/build/sysy.lex.cpp"
+#line 823 "/share/sysy-make-template/build/sysy.lex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1786,6 +1787,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 45 "/share/sysy-make-template/src/sysy.l"
+#line 48 "/share/sysy-make-template/src/sysy.l"
 
 
