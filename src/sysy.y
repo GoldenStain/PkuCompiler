@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 #include "BaseAST.hpp"
 
 
@@ -34,17 +35,20 @@ using namespace std;
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;
+  std::vector<std::unique_ptr<BaseAST>> *vec_val;
 }
 
 // lexer 返回的所有 token 种类的声明
 // 注意 IDENT 和 INT_CONST 会返回 token 的值, 分别对应 str_val 和 int_val
-%token INT RETURN
-%token <str_val> IDENT
+%token RETURN CONST
+%token <str_val> IDENT BTYPE
 %token <int_val> INT_CONST
 
 // 非终结符的类型定义
-%type <ast_val> FuncDef FuncType Block Stmt Exp AddExp PrimaryExp UnaryExp MulExp LorExp LandExp EqExp RelExp
+%type <ast_val> FuncDef FuncType Block Stmt Exp AddExp PrimaryExp UnaryExp MulExp LorExp LandExp EqExp RelExp 
+%type <ast_val> Decl ConstDecl ConstDef ConstInitVal ConstExp BlockItem
 %type <int_val> Number
+%type <vec_val> ConstDefList BlockItemList
 
 %%
 
@@ -83,7 +87,7 @@ FuncDef
 
 // 同上, 不再解释
 FuncType
-  : INT {
+  : BTYPE {
     auto ast = new FuncTypeAST();
     ast->mytype = "int";
     $$ = ast;
@@ -91,12 +95,36 @@ FuncType
   ;
 
 Block
-  : '{' Stmt '}' {
+  : '{' BlockItemList '}' {
     auto ast = new BlockAST();
-    ast->stmt = unique_ptr<BaseAST>($2);
+    ast->blockitem = move(*($2));
     $$ = ast;
   }
   ;
+
+BlockItemList
+ : BlockItem {
+  auto v = new vector<unique_ptr<BaseAST>>();
+  v->push_back(unique_ptr<BaseAST>($1));
+  $$ = move(v);
+ } | BlockItemList BlockItem {
+  auto v = ($1);
+  v->push_back(unique_ptr<BaseAST>($2));
+  $$ = move(v);
+ }
+ ;
+
+BlockItem
+ : Decl {
+  auto ast = new BlockItemAST();
+  ast->decl = unique_ptr<BaseAST>($1);
+  $$ = ast;
+ } | Stmt {
+  auto ast = new BlockItemAST();
+  ast->stmt = unique_ptr<BaseAST>($1);
+  $$ = ast;
+ }
+ ;
 
 Stmt
   : RETURN Exp ';' {
@@ -141,6 +169,10 @@ PrimaryExp
   | Number {
     auto ast = new PrimaryExpAST();
     ast->num = ($1);
+    $$ = ast;
+  } | IDENT {
+    auto ast = new PrimaryExpAST();
+    ast->lval = *unique_ptr<string>($1);
     $$ = ast;
   }
   ;
@@ -288,6 +320,61 @@ Number
   }
   ;
 
+Decl 
+  : ConstDecl {
+    auto ast = new DeclAST();
+    ast->constdecl = unique_ptr<BaseAST>($1);
+    $$ = ast;
+  }
+  ;
+
+ConstDecl
+  : CONST BTYPE ConstDefList ';' {
+    auto ast = new ConstDeclAST();
+    ast->btype = "int";
+    auto v_ptr = ($3);
+    ast->constdef = move(*v_ptr);
+    $$ = ast;
+  }
+  ;
+
+  ConstDefList
+   : ConstDef {
+    auto v = new vector<unique_ptr<BaseAST>>();
+    v->push_back(unique_ptr<BaseAST>($1));
+    $$ = move(v);
+   } | ConstDefList ',' ConstDef {
+    auto v = ($1);
+    v->push_back(unique_ptr<BaseAST>($3));
+    $$ = move(v);
+   }
+   ;
+
+   ConstDef 
+    : IDENT '=' ConstInitVal {
+      auto ast = new ConstDefAST();
+      ast->ident = *unique_ptr<string>($1);
+      ast->constinitval = unique_ptr<BaseAST>($3);
+      $$ = ast;
+    }
+    ;
+
+   ConstInitVal
+    : ConstExp {
+      auto ast = new ConstInitValAST();
+      ast->constexp = unique_ptr<BaseAST>($1);
+      $$ = ast;
+    }
+    ;
+
+  ConstExp 
+   : Exp {
+    auto ast = new ConstExpAST();
+    ast->exp = unique_ptr<BaseAST>($1);
+    $$ = ast;
+   }
+   ;
+  
 %%
 
 // 定义错误处理函数, 其中第二个参数是错误信息

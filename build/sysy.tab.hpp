@@ -57,10 +57,11 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INT = 258,
-    RETURN = 259,
+    RETURN = 258,
+    CONST = 259,
     IDENT = 260,
-    INT_CONST = 261
+    BTYPE = 261,
+    INT_CONST = 262
   };
 #endif
 
@@ -68,13 +69,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 33 "/share/sysy-make-template/src/sysy.y"
+#line 34 "/share/sysy-make-template/src/sysy.y"
 
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;
+  std::vector<std::unique_ptr<BaseAST>> *vec_val;
 
-#line 78 "/share/sysy-make-template/build/sysy.tab.hpp"
+#line 80 "/share/sysy-make-template/build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

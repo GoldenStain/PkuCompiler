@@ -3,18 +3,23 @@
 #include <memory>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 #include <string>
+#include <cassert>
 extern int cnt, rootnum; // rootnum是最原始的操作数，cnt是计算次数
 // 两个数字按位或之后的结果和零作比较，就能得到两个数逻辑或的结果，按位与同理
 
 extern std::unordered_map<char, std::string> ops;
 extern std::unordered_map<std::string, std::string> doubleops;
+extern std::unordered_map<std::string, int32_t> valuechart; 
 
 class BaseAST
 {
 public:
     virtual ~BaseAST() = default;
-    virtual void Dump(std::ostringstream &oss) const = 0;
+    virtual void Dump(std::ostringstream &oss) const {};
+    virtual int32_t IntCal() const {return 0x3f3f3f3f;};
+    virtual void VoidCal() const {}; 
 };
 
 class CompUnitAST : public BaseAST
@@ -56,11 +61,25 @@ public:
 class BlockAST : public BaseAST
 {
 public:
-    std::unique_ptr<BaseAST> stmt;
+    std::vector<std::unique_ptr<BaseAST>> blockitem;
     void Dump(std::ostringstream &oss) const override
     {
-        oss << "%entry:" << std::endl;
-        stmt->Dump(oss);
+        oss << "%entry:" << "\n";
+        for(auto &i : blockitem)
+         i->Dump(oss);
+    }
+};
+
+class BlockItemAST : public BaseAST
+{
+public:
+    std::unique_ptr<BaseAST> decl, stmt;
+    void Dump(std::ostringstream &oss) const override
+    {
+        if(stmt != nullptr) 
+            stmt->Dump(oss);
+        else 
+            decl->VoidCal();
     }
 };
 
@@ -91,6 +110,10 @@ public:
     void Dump(std::ostringstream &oss) const override
     {
         lorexp->Dump(oss);
+    }
+    int32_t IntCal() const override
+    {
+        return lorexp->IntCal();
     }
 };
 
@@ -145,6 +168,17 @@ public:
             PrintOr(or_prd, and_prd, oss);
         }
     }
+    int32_t IntCal() const override
+    {
+        if(lorexp == nullptr)
+            return landexp->IntCal();
+        else
+        {
+            int32_t rightvalue = landexp->IntCal();
+            int32_t leftvalue = lorexp->IntCal();
+            return leftvalue || rightvalue;
+        }
+    }
 };
 
 class LandExpAST : public BaseAST
@@ -194,6 +228,19 @@ public:
             PrintAnd(and_prd, eq_prd, oss);
         }
     }
+    int32_t IntCal() const override
+    {
+        if(landexp == nullptr)
+        {
+            return eqexp->IntCal();
+        }
+        else
+        {
+            int32_t rightvalue = eqexp->IntCal();
+            int32_t leftvalue = landexp->IntCal();
+            return leftvalue && rightvalue;
+        }
+    }
 };
 
 class EqExpAST : public BaseAST
@@ -235,6 +282,16 @@ public:
             PrintEq(eq_prd, rel_prd, eqop, oss);
         }
     }
+    int32_t IntCal() const override
+    {
+        if(eqexp == nullptr)
+            return relexp->IntCal();
+        int32_t rightvalue = relexp->IntCal(),
+                leftvalue = eqexp->IntCal();
+        if (eqop == "==") 
+            return leftvalue == rightvalue;
+        return leftvalue != rightvalue;
+    }
 };
 
 class RelExpAST : public BaseAST
@@ -275,6 +332,17 @@ public:
                         rel_prd = rel_done ? ("%" + std::to_string(rel_cnt)) : std::to_string(root_rel);
             PrintRel(rel_prd, add_prd, relop, oss);
         }
+    }
+    int32_t IntCal() const override
+    {
+        if(relexp == nullptr)
+            return addexp->IntCal();
+        int32_t rightvalue = addexp->IntCal(),
+                leftvalue = relexp->IntCal();
+        if(relop == ">") return leftvalue > rightvalue;
+        if(relop == "<") return leftvalue < rightvalue;
+        if(relop == ">=") return leftvalue >= rightvalue;
+        return leftvalue <= rightvalue;
     }
 };
 
@@ -329,6 +397,15 @@ public:
             PrintAdd(mul_done, add_done, root_mul, root_add, oss);
         }
     }
+    int32_t IntCal() const override
+    {
+        if(aexp == nullptr)
+            return mexp->IntCal();
+        int32_t rightvalue = mexp->IntCal(),
+                leftvalue = aexp->IntCal();
+        if(aop == '+') return leftvalue + rightvalue;
+        return leftvalue - rightvalue;
+    }
 };
 
 class MulExpAST : public BaseAST
@@ -377,6 +454,16 @@ public:
             cnt++;
         }
     }
+    int32_t IntCal() const override
+    {
+        if(mexp == nullptr) 
+            return uexp->IntCal();
+        int32_t rightvalue = uexp->IntCal(),
+                leftvalue = mexp->IntCal();
+        if(mop == '*') return leftvalue * rightvalue;
+        if(mop == '/') return leftvalue / rightvalue;
+        return leftvalue % rightvalue;
+    }
 };
 
 class UnaryExpAST : public BaseAST
@@ -418,6 +505,15 @@ public:
         else
             pexp->Dump(oss);
     }
+    int32_t IntCal() const override
+    {
+        if(uexp == nullptr)
+            return pexp->IntCal();
+        int32_t rightvalue = uexp->IntCal();
+        if(uop == '!') return !rightvalue;
+        if(uop == '-') return -rightvalue;
+        return rightvalue;
+    }
 };
 
 class PrimaryExpAST : public BaseAST
@@ -425,15 +521,102 @@ class PrimaryExpAST : public BaseAST
 public:
     std::unique_ptr<BaseAST> exp;
     int num;
+    std::string lval = "null";
     void Dump(std::ostringstream &oss) const override
     {
         if (exp == nullptr)
         {
-            rootnum = num;
+            if(lval != "null") 
+            {
+                // 检测该变量是否存在
+                if(!valuechart.count(lval))
+                {
+                    std::cout << "target " << lval << " not found \n";
+                    assert(false);
+                }
+                else rootnum = valuechart[lval];
+            }
+            else rootnum = num;
         }
         else
         {
             exp->Dump(oss);
         }
+    }
+    int32_t IntCal() const override
+    {
+        if(exp == nullptr) 
+        {
+            if(lval != "null")
+            {
+                // 检测该变量是否存在
+                if(!valuechart.count(lval))
+                {
+                    std::cout << "target " << lval << " not found \n";
+                    assert(false);
+                }
+                else return valuechart[lval];
+            }
+            else return num;
+        }
+        else
+        {
+            return exp->IntCal();
+        }
+    }
+};
+
+class DeclAST: public BaseAST
+{
+public:
+    std::unique_ptr<BaseAST> constdecl;
+    void VoidCal() const override
+    {
+        constdecl->VoidCal();
+    }
+};
+
+class ConstDeclAST: public BaseAST
+{
+public:
+    std::string btype;
+    std::vector<std::unique_ptr<BaseAST>> constdef;
+    void VoidCal() const override
+    {
+        for(auto &i : constdef)
+        {
+            i->VoidCal();
+        }
+    }
+};
+
+class ConstDefAST: public BaseAST
+{
+public:
+    std::string ident;
+    std::unique_ptr<BaseAST> constinitval;
+    void VoidCal() const override
+    {
+        valuechart[ident] = constinitval->IntCal();
+    }
+};
+
+class ConstInitValAST: public BaseAST
+{
+public:
+    std::unique_ptr<BaseAST> constexp;
+    int32_t IntCal() const override
+    {
+        return constexp->IntCal();
+    }
+};
+
+class ConstExpAST : public BaseAST
+{
+public:
+    std::unique_ptr<BaseAST> exp;
+    int32_t IntCal() const override
+    {
+        return exp->IntCal();
     }
 };

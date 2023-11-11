@@ -21,6 +21,7 @@ int cnt, rootnum;
 unordered_map<char, string> ops;
 unordered_map<string, string> doubleops;
 unordered_map<ull, int> registers;
+unordered_map<string, int32_t> valuechart;
 
 int main(int argc, const char *argv[])
 {
@@ -61,7 +62,6 @@ int main(int argc, const char *argv[])
   }
   else if (!strcmp(mode, "-koopa"))
   {
-    cout << "yes";
     freopen(output, "w", stdout);
     cout << Mystr;
   }
