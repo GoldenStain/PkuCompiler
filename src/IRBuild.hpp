@@ -270,7 +270,7 @@ void get_both(const koopa_raw_value_t &L, const koopa_raw_value_t &R, int &l_reg
             l_reg_idx = -1;
         else
         {
-            cout << "\tlw\t" << reg_names[now_using_reg++] << ", " << L->kind.data.integer.value << "\n";
+            cout << "\tli\t" << reg_names[now_using_reg++] << ", " << L->kind.data.integer.value << "\n";
             l_reg_idx = now_using_reg - 1;
         }
     }
@@ -286,7 +286,7 @@ void get_both(const koopa_raw_value_t &L, const koopa_raw_value_t &R, int &l_reg
             r_reg_idx = -1;
         else
         {
-            cout << "\tlw\t" << reg_names[now_using_reg++] << ", " << R->kind.data.integer.value << "\n";
+            cout << "\tli\t" << reg_names[now_using_reg++] << ", " << R->kind.data.integer.value << "\n";
             r_reg_idx = now_using_reg - 1;
         }
     }
