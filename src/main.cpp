@@ -6,7 +6,6 @@
 #include <sstream>
 #include "BaseAST.hpp"
 #include "IRBuild.hpp"
-
 using namespace std;
 
 // 声明 lexer 的输入, 以及 parser 函数
@@ -17,11 +16,14 @@ using namespace std;
 extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 int cnt, rootnum;
+int function_memory, moffset;
+bool is_const_exp;
 
 unordered_map<char, string> ops;
 unordered_map<string, string> doubleops;
-unordered_map<ull, int> registers;
-unordered_map<string, int32_t> valuechart;
+unordered_map<koopa_raw_value_t, int> memories;
+unordered_map<string, Mytype> valuechart;
+ostringstream oss;
 
 int main(int argc, const char *argv[])
 {
@@ -51,8 +53,7 @@ int main(int argc, const char *argv[])
   unique_ptr<BaseAST> ast;
   auto ret = yyparse(ast);
   assert(!ret);
-  ostringstream oss;
-  ast->Dump(oss);
+  ast->Dump();
   string Mystr = oss.str();
   if (!strcmp(mode, "-riscv"))
   {
