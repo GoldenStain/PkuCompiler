@@ -136,6 +136,20 @@ Stmt
     ast->lval = *unique_ptr<string>($1);
     ast->exp = unique_ptr<BaseAST>($3);
     $$ = ast;
+  } | Block {
+    auto ast = new StmtAST();
+    ast->block = unique_ptr<BaseAST>($1);
+    $$ = ast;
+  } | ';'{
+    auto ast = new StmtAST();
+    $$ = ast;
+  } | RETURN ';' {
+    auto ast = new StmtAST();
+    $$ = ast;
+  } | Exp ';' {
+    auto ast = new StmtAST();
+    ast->exp = unique_ptr<BaseAST>($1);
+    $$ = ast;
   }
   ;
 

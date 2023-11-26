@@ -6,9 +6,6 @@
 #include <vector>
 #include <string>
 #include <cassert>
-extern int cnt, rootnum; // rootnum是最原始的操作数，cnt是计算次数
-extern bool is_const_exp;
-// 两个数字按位或之后的结果和零作比较，就能得到两个数逻辑或的结果，按位与同理
 
 struct Mytype
 {
@@ -16,9 +13,32 @@ struct Mytype
     int32_t ItsValue;
 };
 
+typedef std::unordered_map<std::string, Mytype> ident_map;
+typedef ident_map *ident_map_t;
+typedef valuechart *valuechart_t;
+
+struct valuechart
+{
+    ident_map chart;
+    valuechart_t father;
+    int32_t depth = 1;
+    valuechart() : father(nullptr) {}
+    valuechart_t ident_search(valuechart_t, std::string &ident)
+    {
+        if(chart.count(ident)) return this;
+        if(father == nullptr) return nullptr;
+        return ident_search(father, ident);
+    }
+};
+
+extern int cnt, rootnum; // rootnum是最原始的操作数，cnt是计算次数
+extern bool is_const_exp;
+extern valuechart_t rootchart, nowchart;
+
+// 两个数字按位或之后的结果和零作比较，就能得到两个数逻辑或的结果，按位与同理
+
 extern std::unordered_map<char, std::string> ops;
 extern std::unordered_map<std::string, std::string> doubleops;
-extern std::unordered_map<std::string, Mytype> valuechart;
 extern std::ostringstream oss;
 
 class BaseAST
@@ -48,9 +68,12 @@ public:
     std::unique_ptr<BaseAST> block;
     void Dump() const override
     {
+        nowchart = rootchart;
         func_type->Dump();
         oss << "@" << ident << "(): ";
         oss << "i32 { " << std::endl;
+        oss << "%entry:"
+            << "\n";
         block->Dump();
         oss << "}";
     }
@@ -72,8 +95,6 @@ public:
     std::vector<std::unique_ptr<BaseAST>> blockitem;
     void Dump() const override
     {
-        oss << "%entry:"
-            << "\n";
         for (auto &i : blockitem)
             i->Dump();
     }
@@ -96,43 +117,61 @@ class StmtAST : public BaseAST
 {
 public:
     std::unique_ptr<BaseAST> exp;
+    std::unique_ptr<BaseAST> block;
     std::string lval = "null";
     void Dump() const override
     {
-        if (lval == "null")
+        if (block == nullptr)
         {
-            // oss << "ret " << number << std::endl;
-            exp->Dump();
-            /*if (flag)
-                oss << "ret %" << ();
+            if (lval == "null")
+            {
+                // oss << "ret " << number << std::endl;
+                exp->Dump();
+                /*if (flag)
+                    oss << "ret %" << ();
+                else
+                    oss << "ret " << rootnum;*/
+                if (!cnt)
+                    oss << "ret " << rootnum;
+                else
+                    oss << "ret %" << cnt - 1;
+                oss << "\n";
+            }
             else
-                oss << "ret " << rootnum;*/
-            if (!cnt)
-                oss << "ret " << rootnum;
-            else
-                oss << "ret %" << cnt - 1;
-            oss << "\n";
+            {
+                auto tmp_t = nowchart->ident_search(nowchart, lval);
+                if (tmp_t == nullptr)
+                {
+                    std::cout << "target " << lval << "not found\n";
+                    assert(false);
+                }
+                else
+                {
+                    auto &tmp = *tmp_t;
+                    if (tmp.chart[lval].ItsType == 0)
+                    {
+                        std::cout << lval << "is not a variable\n";
+                        assert(false);
+                    }
+                    tmp[lval].ItsType = 2; // 更新该常量的状态
+                    int old_cnt = cnt;
+                    exp->Dump();
+                    tmp[lval].ItsValue = exp->IntCal();
+                    if (old_cnt != cnt)
+                        oss << "store %" << cnt - 1 << ", @" << lval << "_" << tmp.depth << "\n";
+                    else
+                        oss << "store " << rootnum << ", @" << lval << "_" << tmp.depth << "\n";
+                }
+            }
         }
         else
         {
-            if (!valuechart.count(lval))
-            {
-                std::cout << "target " << lval << "not found\n";
-                assert(false);
-            }
-            else if (valuechart[lval].ItsType == 0)
-            {
-                std::cout << lval << "is not a variable\n";
-                assert(false);
-            }
-            valuechart[lval].ItsType = 2; // 更新该常量的状态
-            int old_cnt = cnt;
-            exp->Dump();
-            valuechart[lval].ItsValue = exp->IntCal();
-            if (old_cnt != cnt)
-                oss << "store %" << cnt - 1 << ", @" << lval << "\n";
-            else
-                oss << "store " << rootnum << ", @" << lval << "\n";
+            nowchart = new valuechart();
+            nowchart->depth = rootchart->depth + 1;
+            nowchart->father = rootchart;
+            block->Dump();
+            delete (nowchart);
+            nowchart = rootchart;
         }
     }
 };
@@ -578,29 +617,30 @@ public:
         {
             if (lval != "null")
             {
+                auto tmp_t = nowchart->ident_search(nowchart, lval);
                 // 检测该变量是否存在
-                if (!valuechart.count(lval))
+                if (tmp_t == nullptr)
                 {
                     std::cout << "target " << lval << " not found \n";
                     assert(false);
                 }
                 else
                 {
-                    auto tmp = valuechart[lval];
-                    if (tmp.ItsType == 1) // 是否已经定义
+                    auto k = tmp[lval];
+                    if (k.ItsType == 1) // 是否已经定义
                     {
                         std::cout << "target " << lval << "not defined \n";
                         assert(false);
                     }
-                    else if (is_const_exp && tmp.ItsType == 2)
+                    else if (is_const_exp && k.ItsType == 2)
                     {
                         std::cout << lval << "is a variavle\n";
                         assert(false);
                     }
                     /*else
                         rootnum = tmp.ItsValue;*/
-                    else if (tmp.ItsType == 0)
-                        rootnum = tmp.ItsValue;
+                    else if (k.ItsType == 0)
+                        rootnum = k.ItsValue;
                     else // 是一个变量
                     {
                         oss << "%" << cnt++ << " = "
@@ -622,29 +662,30 @@ public:
         {
             if (lval != "null")
             {
+                auto &tmp = nowchart->chart;
                 // 检测该变量是否存在
-                if (!valuechart.count(lval))
+                if (!tmp.count(lval))
                 {
                     std::cout << "target " << lval << " not found \n";
                     assert(false);
                 }
                 else
                 {
-                    auto tmp = valuechart[lval];
-                    if (tmp.ItsType == 1)
+                    auto k = tmp[lval];
+                    if (k.ItsType == 1)
                     {
                         std::cout << "target " << lval << "not defined \n";
                         assert(false);
                     }
                     /*else if(tmp.ItsType == 0)
                         return tmp.ItsValue;
-                    else 
+                    else
                     {
                         oss << "%" << cnt++ << " = load @" << lval << "\n";
-                        return tmp.ItsValue; 
-                    }*/
-                    else 
                         return tmp.ItsValue;
+                    }*/
+                    else
+                        return k.ItsValue;
                 }
             }
             else
@@ -690,7 +731,8 @@ public:
     std::unique_ptr<BaseAST> initval;
     void VoidCal() const override
     {
-        if (valuechart.count(ident))
+        auto &tmp = nowchart->chart;
+        if (tmp.count(ident))
         {
             std::cout << ident << "mutiple defined\n";
             assert(false);
@@ -698,13 +740,13 @@ public:
         oss << "@" << ident << " = alloc i32\n";
         if (initval != nullptr)
         {
-            valuechart[ident].ItsType = 2;
-            valuechart[ident].ItsValue = initval->IntCal();
-            oss << "store " << valuechart[ident].ItsValue << ", @" << ident << "\n";
+            tmp[ident].ItsType = 2;
+            tmp[ident].ItsValue = initval->IntCal();
+            oss << "store " << tmp[ident].ItsValue << ", @" << ident << "\n";
         }
         else
         {
-            valuechart[ident].ItsType = 1;
+            tmp[ident].ItsType = 1;
         }
     }
 };
@@ -740,13 +782,14 @@ public:
     std::unique_ptr<BaseAST> constinitval;
     void VoidCal() const override
     {
-        if (valuechart.count(ident))
+        auto &tmp = nowchart->chart;
+        if (tmp.count(ident))
         {
             std::cout << ident << "multiple defined\n";
             assert(false);
         }
-        valuechart[ident].ItsType = 0;
-        valuechart[ident].ItsValue = constinitval->IntCal();
+        tmp[ident].ItsType = 0;
+        tmp[ident].ItsValue = constinitval->IntCal();
     }
 };
 
