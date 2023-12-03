@@ -1,11 +1,9 @@
-/share/sysy-make-template/build/main.cpp.o: \
-  /share/sysy-make-template/src/main.cpp \
-  /share/sysy-make-template/src/BaseAST.hpp \
-  /share/sysy-make-template/src/IRBuild.hpp \
-  /share/sysy-make-template/src/koopa.h
+/root/compiler/build/main.cpp.o: /root/compiler/src/main.cpp \
+  /root/compiler/src/BaseAST.hpp /root/compiler/src/IRBuild.hpp \
+  /root/compiler/src/koopa.h
 
-/share/sysy-make-template/src/BaseAST.hpp:
+/root/compiler/src/BaseAST.hpp:
 
-/share/sysy-make-template/src/IRBuild.hpp:
+/root/compiler/src/IRBuild.hpp:
 
-/share/sysy-make-template/src/koopa.h:
+/root/compiler/src/koopa.h:

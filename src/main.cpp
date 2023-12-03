@@ -22,7 +22,7 @@ bool is_const_exp;
 unordered_map<char, string> ops;
 unordered_map<string, string> doubleops;
 unordered_map<koopa_raw_value_t, int> memories;
-valuechart_t rootchart, nowchart;
+valuechart_t nowchart;
 
 ostringstream oss;
 

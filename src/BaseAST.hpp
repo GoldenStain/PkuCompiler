@@ -6,36 +6,43 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#define RED "\033[0;32;31m"
+#define NONE "\033[m"
 
 struct Mytype
 {
-    int32_t ItsType; // 0è¡¨ç¤ºå¸¸é‡ï¼Œ1è¡¨ç¤ºå˜é‡æœªå®šä¹‰çš„å˜é‡ï¼Œ2è¡¨ç¤ºå·²ç»å®šä¹‰çš„å˜é‡
+    int32_t ItsType; // 0±íÊ¾³£Á¿?1±íÊ¾±äÁ¿Î´¶¨ÒåµÄ±äÁ¿2±íÊ¾ÒÑ¾­¶¨ÒåµÄ±äÁ¿
     int32_t ItsValue;
 };
 
 typedef std::unordered_map<std::string, Mytype> ident_map;
 typedef ident_map *ident_map_t;
+
+struct valuechart;
+
 typedef valuechart *valuechart_t;
 
 struct valuechart
 {
     ident_map chart;
+    int32_t depth;
     valuechart_t father;
-    int32_t depth = 1;
-    valuechart() : father(nullptr) {}
-    valuechart_t ident_search(valuechart_t, std::string &ident)
+    valuechart() : depth(1), father(nullptr) {}
+    valuechart_t ident_search(const std::string &ident)
     {
-        if(chart.count(ident)) return this;
-        if(father == nullptr) return nullptr;
-        return ident_search(father, ident);
+        if (chart.count(ident))
+            return this;
+        if (father == nullptr)
+            return nullptr;
+        return father->ident_search(ident);
     }
 };
 
-extern int cnt, rootnum; // rootnumæ˜¯æœ€åŸå§‹çš„æ“ä½œæ•°ï¼Œcntæ˜¯è®¡ç®—æ¬¡æ•°
+extern int cnt, rootnum; // rootnumÊÇ×îÔ­Ê¼µÄ²Ù×÷Êı£¬cntÊÇ¼ÆËã´ÎÊı
 extern bool is_const_exp;
-extern valuechart_t rootchart, nowchart;
+extern valuechart_t nowchart;
 
-// ä¸¤ä¸ªæ•°å­—æŒ‰ä½æˆ–ä¹‹åçš„ç»“æœå’Œé›¶ä½œæ¯”è¾ƒï¼Œå°±èƒ½å¾—åˆ°ä¸¤ä¸ªæ•°é€»è¾‘æˆ–çš„ç»“æœï¼ŒæŒ‰ä½ä¸åŒç†
+// Á½¸öÊı×Ö°´Î»»òÖ®ºóµÄ½á¹ûºÍÁã×÷±È½Ï£¬¾ÍÄÜµÃµ½Á½¸öÊıÂß¼­»òµÄ½á¹û£¬°´Î»ÓëÍ¬Àí
 
 extern std::unordered_map<char, std::string> ops;
 extern std::unordered_map<std::string, std::string> doubleops;
@@ -56,6 +63,7 @@ public:
     std::unique_ptr<BaseAST> func_def;
     void Dump() const override
     {
+        nowchart = new valuechart();
         func_def->Dump();
     }
 };
@@ -68,7 +76,6 @@ public:
     std::unique_ptr<BaseAST> block;
     void Dump() const override
     {
-        nowchart = rootchart;
         func_type->Dump();
         oss << "@" << ident << "(): ";
         oss << "i32 { " << std::endl;
@@ -88,15 +95,17 @@ public:
         oss << "fun ";
     }
 };
-
 class BlockAST : public BaseAST
 {
 public:
     std::vector<std::unique_ptr<BaseAST>> blockitem;
     void Dump() const override
     {
-        for (auto &i : blockitem)
-            i->Dump();
+        if (!blockitem.empty())
+        {
+            for (auto &i : blockitem)
+                i->Dump();
+        }
     }
 };
 
@@ -116,30 +125,42 @@ public:
 class StmtAST : public BaseAST
 {
 public:
+    bool is_return = 0, is_empty = 0;
     std::unique_ptr<BaseAST> exp;
     std::unique_ptr<BaseAST> block;
     std::string lval = "null";
     void Dump() const override
     {
+        if(is_empty)
+            return ;
         if (block == nullptr)
         {
             if (lval == "null")
             {
                 // oss << "ret " << number << std::endl;
+                int old_cnt = cnt;
                 exp->Dump();
                 /*if (flag)
                     oss << "ret %" << ();
                 else
                     oss << "ret " << rootnum;*/
-                if (!cnt)
-                    oss << "ret " << rootnum;
-                else
-                    oss << "ret %" << cnt - 1;
-                oss << "\n";
+                if (is_return)
+                {
+                    if (exp == nullptr)
+                    {
+                        oss << "ret 0\n";
+                        return;
+                    }
+                    if (cnt == old_cnt)
+                        oss << "ret " << rootnum;
+                    else
+                        oss << "ret %" << cnt - 1;
+                    oss << "\n";
+                }
             }
             else
             {
-                auto tmp_t = nowchart->ident_search(nowchart, lval);
+                auto tmp_t = nowchart->ident_search(lval);
                 if (tmp_t == nullptr)
                 {
                     std::cout << "target " << lval << "not found\n";
@@ -147,25 +168,27 @@ public:
                 }
                 else
                 {
-                    auto &tmp = *tmp_t;
-                    if (tmp.chart[lval].ItsType == 0)
+                    auto &tmp = tmp_t->chart;
+                    if (tmp[lval].ItsType == 0)
                     {
                         std::cout << lval << "is not a variable\n";
                         assert(false);
                     }
-                    tmp[lval].ItsType = 2; // æ›´æ–°è¯¥å¸¸é‡çš„çŠ¶æ€
+                    tmp[lval].ItsType = 2; // ¸üĞÂ¸Ã³£Á¿µÄ×´Ì¬
                     int old_cnt = cnt;
                     exp->Dump();
                     tmp[lval].ItsValue = exp->IntCal();
                     if (old_cnt != cnt)
-                        oss << "store %" << cnt - 1 << ", @" << lval << "_" << tmp.depth << "\n";
+                        oss << "store %" << cnt - 1 << ", @" << lval << "_" << tmp_t->depth << "\n";
                     else
-                        oss << "store " << rootnum << ", @" << lval << "_" << tmp.depth << "\n";
+                        oss << "store " << rootnum << ", @" << lval << "_" << tmp_t->depth << "\n";
                 }
             }
         }
         else
         {
+            auto rootchart = new valuechart();
+            rootchart = nowchart;
             nowchart = new valuechart();
             nowchart->depth = rootchart->depth + 1;
             nowchart->father = rootchart;
@@ -617,8 +640,8 @@ public:
         {
             if (lval != "null")
             {
-                auto tmp_t = nowchart->ident_search(nowchart, lval);
-                // æ£€æµ‹è¯¥å˜é‡æ˜¯å¦å­˜åœ¨
+                auto tmp_t = nowchart->ident_search(lval);
+                // ¼ì²â¸Ã±äÁ¿ÊÇ·ñ´æÔÚ
                 if (tmp_t == nullptr)
                 {
                     std::cout << "target " << lval << " not found \n";
@@ -626,8 +649,8 @@ public:
                 }
                 else
                 {
-                    auto k = tmp[lval];
-                    if (k.ItsType == 1) // æ˜¯å¦å·²ç»å®šä¹‰
+                    auto &k = tmp_t->chart[lval];
+                    if (k.ItsType == 1) // ÊÇ·ñÒÑ¾­¶¨Òå
                     {
                         std::cout << "target " << lval << "not defined \n";
                         assert(false);
@@ -641,10 +664,10 @@ public:
                         rootnum = tmp.ItsValue;*/
                     else if (k.ItsType == 0)
                         rootnum = k.ItsValue;
-                    else // æ˜¯ä¸€ä¸ªå˜é‡
+                    else // ÊÇÒ»¸ö±äÁ¿
                     {
                         oss << "%" << cnt++ << " = "
-                            << "load @" << lval << "\n";
+                            << "load @" << lval << "_" << tmp_t->depth << "\n";
                     }
                 }
             }
@@ -662,16 +685,16 @@ public:
         {
             if (lval != "null")
             {
-                auto &tmp = nowchart->chart;
-                // æ£€æµ‹è¯¥å˜é‡æ˜¯å¦å­˜åœ¨
-                if (!tmp.count(lval))
+                auto tmp_t = nowchart->ident_search(lval);
+                // ¼ì²â¸Ã±äÁ¿ÊÇ·ñ´æÔÚ
+                if (tmp_t == nullptr)
                 {
                     std::cout << "target " << lval << " not found \n";
                     assert(false);
                 }
                 else
                 {
-                    auto k = tmp[lval];
+                    auto &k = tmp_t->chart[lval];
                     if (k.ItsType == 1)
                     {
                         std::cout << "target " << lval << "not defined \n";
@@ -732,17 +755,17 @@ public:
     void VoidCal() const override
     {
         auto &tmp = nowchart->chart;
-        if (tmp.count(ident))
+        if (tmp.count(ident)) // Èç¹ûÔÚÍ¬Ò»²ãÒÑ¾­¶¨Òå¹ı
         {
             std::cout << ident << "mutiple defined\n";
             assert(false);
         }
-        oss << "@" << ident << " = alloc i32\n";
+        oss << "@" << ident << "_" << nowchart->depth << " = alloc i32\n";
         if (initval != nullptr)
         {
             tmp[ident].ItsType = 2;
             tmp[ident].ItsValue = initval->IntCal();
-            oss << "store " << tmp[ident].ItsValue << ", @" << ident << "\n";
+            oss << "store " << tmp[ident].ItsValue << ", @" << ident << "_" << nowchart->depth << "\n";
         }
         else
         {

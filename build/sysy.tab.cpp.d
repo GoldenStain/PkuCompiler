@@ -1,5 +1,4 @@
-/share/sysy-make-template/build/sysy.tab.cpp.o: \
-  /share/sysy-make-template/build/sysy.tab.cpp \
-  /share/sysy-make-template/src/BaseAST.hpp
+/root/compiler/build/sysy.tab.cpp.o: /root/compiler/build/sysy.tab.cpp \
+  /root/compiler/src/BaseAST.hpp
 
-/share/sysy-make-template/src/BaseAST.hpp:
+/root/compiler/src/BaseAST.hpp:

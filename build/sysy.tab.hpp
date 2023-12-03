@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_SHARE_SYSY_MAKE_TEMPLATE_BUILD_SYSY_TAB_HPP_INCLUDED
-# define YY_YY_SHARE_SYSY_MAKE_TEMPLATE_BUILD_SYSY_TAB_HPP_INCLUDED
+#ifndef YY_YY_ROOT_COMPILER_BUILD_SYSY_TAB_HPP_INCLUDED
+# define YY_YY_ROOT_COMPILER_BUILD_SYSY_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -44,13 +44,13 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 1 "/share/sysy-make-template/src/sysy.y"
+#line 1 "/root/compiler/src/sysy.y"
 
   #include <memory>
   #include <string>
   #include "BaseAST.hpp"
 
-#line 54 "/share/sysy-make-template/build/sysy.tab.hpp"
+#line 54 "/root/compiler/build/sysy.tab.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -69,14 +69,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 34 "/share/sysy-make-template/src/sysy.y"
+#line 34 "/root/compiler/src/sysy.y"
 
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;
   std::vector<std::unique_ptr<BaseAST>> *vec_val;
 
-#line 80 "/share/sysy-make-template/build/sysy.tab.hpp"
+#line 80 "/root/compiler/build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -89,4 +89,4 @@ extern YYSTYPE yylval;
 
 int yyparse (std::unique_ptr<BaseAST> &ast);
 
-#endif /* !YY_YY_SHARE_SYSY_MAKE_TEMPLATE_BUILD_SYSY_TAB_HPP_INCLUDED  */
+#endif /* !YY_YY_ROOT_COMPILER_BUILD_SYSY_TAB_HPP_INCLUDED  */
