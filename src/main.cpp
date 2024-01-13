@@ -8,11 +8,11 @@
 #include "IRBuild.hpp"
 using namespace std;
 
-// å£°æ˜ lexer çš„è¾“å…¥, ä»¥åŠ parser å‡½æ•°
-// ä¸ºä»€ä¹ˆä¸å¼•ç”¨ sysy.tab.hpp å‘¢? å› ä¸ºé¦–å…ˆé‡Œé¢æ²¡æœ‰ yyin çš„å®šä¹‰
-// å…¶æ¬¡, å› ä¸ºè¿™ä¸ªæ–‡ä»¶ä¸æ˜¯æˆ‘ä»¬è‡ªå·±å†™çš„, è€Œæ˜¯è¢« Bison ç”Ÿæˆå‡ºæ¥çš„
-// ä½ çš„ä»£ç ç¼–è¾‘å™¨/IDE å¾ˆå¯èƒ½æ‰¾ä¸åˆ°è¿™ä¸ªæ–‡ä»¶, ç„¶åä¼šç»™ä½ æŠ¥é”™ (è™½ç„¶ç¼–è¯‘ä¸ä¼šå‡ºé”™)
-// çœ‹èµ·æ¥ä¼šå¾ˆçƒ¦äºº, äºæ˜¯å¹²è„†é‡‡ç”¨è¿™ç§çœ‹èµ·æ¥ dirty ä½†å®é™…å¾ˆæœ‰æ•ˆçš„æ‰‹æ®µ
+// ÉùÃ÷ lexer µÄÊäÈë, ÒÔ¼° parser º¯Êı
+// ÎªÊ²Ã´²»ÒıÓÃ sysy.tab.hpp ÄØ? ÒòÎªÊ×ÏÈÀïÃæÃ»ÓĞ yyin µÄ¶¨Òå
+// Æä´Î, ÒòÎªÕâ¸öÎÄ¼ş²»ÊÇÎÒÃÇ×Ô¼ºĞ´µÄ, ¶øÊÇ±» Bison Éú³É³öÀ´µÄ
+// ÄãµÄ´úÂë±à¼­Æ÷/IDE ºÜ¿ÉÄÜÕÒ²»µ½Õâ¸öÎÄ¼ş, È»ºó»á¸øÄã±¨´í (ËäÈ»±àÒë²»»á³ö´í)
+// ¿´ÆğÀ´»áºÜ·³ÈË, ÓÚÊÇ¸É´à²ÉÓÃÕâÖÖ¿´ÆğÀ´ dirty µ«Êµ¼ÊºÜÓĞĞ§µÄÊÖ¶Î
 extern FILE *yyin;
 extern int yyparse(unique_ptr<BaseAST> &ast);
 int cnt, rootnum;
@@ -22,7 +22,7 @@ bool is_const_exp;
 unordered_map<char, string> ops;
 unordered_map<string, string> doubleops;
 unordered_map<koopa_raw_value_t, int> memories;
-valuechart_t nowchart;
+valuechart_t rootchart, nowchart;
 
 ostringstream oss;
 
@@ -39,18 +39,18 @@ int main(int argc, const char *argv[])
   doubleops["<"] = "lt";
   doubleops[">="] = "ge";
   doubleops["<="] = "le";
-  //  è§£æå‘½ä»¤è¡Œå‚æ•°. æµ‹è¯•è„šæœ¬/è¯„æµ‹å¹³å°è¦æ±‚ä½ çš„ç¼–è¯‘å™¨èƒ½æ¥æ”¶å¦‚ä¸‹å‚æ•°:
-  //  compiler æ¨¡å¼ è¾“å…¥æ–‡ä»¶ -o è¾“å‡ºæ–‡ä»¶
+  //  ½âÎöÃüÁîĞĞ²ÎÊı. ²âÊÔ½Å±¾/ÆÀ²âÆ½Ì¨ÒªÇóÄãµÄ±àÒëÆ÷ÄÜ½ÓÊÕÈçÏÂ²ÎÊı:
+  //  compiler Ä£Ê½ ÊäÈëÎÄ¼ş -o Êä³öÎÄ¼ş
   assert(argc == 5);
   auto mode = argv[1];
   auto input = argv[2];
   auto output = argv[4];
 
-  // æ‰“å¼€è¾“å…¥æ–‡ä»¶, å¹¶ä¸”æŒ‡å®š lexer åœ¨è§£æçš„æ—¶å€™è¯»å–è¿™ä¸ªæ–‡ä»¶
+  // ´ò¿ªÊäÈëÎÄ¼ş, ²¢ÇÒÖ¸¶¨ lexer ÔÚ½âÎöµÄÊ±ºò¶ÁÈ¡Õâ¸öÎÄ¼ş
   yyin = fopen(input, "r");
   assert(yyin);
 
-  // è°ƒç”¨ parser å‡½æ•°, parser å‡½æ•°ä¼šè¿›ä¸€æ­¥è°ƒç”¨ lexer è§£æè¾“å…¥æ–‡ä»¶çš„
+  // µ÷ÓÃ parser º¯Êı, parser º¯Êı»á½øÒ»²½µ÷ÓÃ lexer ½âÎöÊäÈëÎÄ¼şµÄ
   unique_ptr<BaseAST> ast;
   auto ret = yyparse(ast);
   assert(!ret);
@@ -72,6 +72,6 @@ int main(int argc, const char *argv[])
     cout << "unspecified type" << endl;
     assert(false);
   }
-  // è¾“å‡ºè§£æå¾—åˆ°çš„ AST, å…¶å®å°±æ˜¯ä¸ªå­—ç¬¦ä¸²
+  // Êä³ö½âÎöµÃµ½µÄ AST, ÆäÊµ¾ÍÊÇ¸ö×Ö·û´®
   return 0;
 }

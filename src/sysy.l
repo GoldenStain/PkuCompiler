@@ -11,25 +11,25 @@
 using namespace std;
 %}
 
-/* ç©ºç™½ç¬¦å’Œæ³¨é‡Š */
+/* ¿Õ°×·ûºÍ×¢ÊÍ */
 WhiteSpace    [ \t\n\r]*
 LineComment   \/\/.*
 BlockComment "/*"([^*]*|(\*+[^/]))*"*/"
 
-/* æ ‡è¯†ç¬¦ */
+/* ±êÊ¶·û */
 Identifier    [a-zA-Z_][a-zA-Z0-9_]*
 Btype "int"
 
-/* æ•´æ•°å­—é¢é‡ */
+/* ÕûÊı×ÖÃæÁ¿ */
 Decimal       [1-9][0-9]*
 Octal         0[0-7]*
 Hexadecimal   0[xX][0-9a-fA-F]+
 
-/* åŒå­—ç¬¦è¿ç®—ç¬¦ */
+/* Ë«×Ö·ûÔËËã·û */
 
 %%
-{WhiteSpace}    { /* å¿½ç•¥, ä¸åšä»»ä½•æ“ä½œ */ }
-{LineComment}   { /* å¿½ç•¥, ä¸åšä»»ä½•æ“ä½œ */ }
+{WhiteSpace}    { /* ºöÂÔ, ²»×öÈÎºÎ²Ù×÷ */ }
+{LineComment}   { /* ºöÂÔ, ²»×öÈÎºÎ²Ù×÷ */ }
 {BlockComment}   { }
 
 "return"        { return RETURN; }
@@ -45,5 +45,7 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 {Hexadecimal}   { yylval.int_val = strtol(yytext, nullptr, 0); return INT_CONST; }
 
 .               { return yytext[0]; }
+
+
 
 %%
