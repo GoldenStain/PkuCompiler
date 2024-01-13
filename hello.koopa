@@ -1,0 +1,6 @@
+fun @main(): i32 { 
+%entry:
+@a_5 = alloc i32
+store 100, @a_5
+ret 1
+}

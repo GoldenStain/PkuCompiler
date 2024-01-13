@@ -1,32 +1,77 @@
 #include <cassert>
-#include <fstream>
-#include <unordered_map>
-
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <sstream>
+#include "BaseAST.hpp"
+#include "IRBuild.hpp"
 using namespace std;
 
-std::unordered_map<char, const char *> generator = {
-    {'k', R"(fun @main(): i32 {
-%entry:
-  ret 0
-}
-)"},
-    {'r', R"(  .text
-  .globl main
-main:
-  li a0, 0
-  ret
-)"},
-    {'p', R"(  .text
-  .globl main
-main:
-  li a0, 0
-  ret
-)"},
-};
+// 声明 lexer 的输入, 以及 parser 函数
+// 为什么不引用 sysy.tab.hpp 呢? 因为首先里面没有 yyin 的定义
+// 其次, 因为这个文件不是我们自己写的, 而是被 Bison 生成出来的
+// 你的代码编辑器/IDE 很可能找不到这个文件, 然后会给你报错 (虽然编译不会出错)
+// 看起来会很烦人, 于是干脆采用这种看起来 dirty 但实际很有效的手段
+extern FILE *yyin;
+extern int yyparse(unique_ptr<BaseAST> &ast);
+int cnt, rootnum;
+int function_memory, moffset;
+bool is_const_exp;
 
-int main(int argc, const char *argv[]) {
+unordered_map<char, string> ops;
+unordered_map<string, string> doubleops;
+unordered_map<koopa_raw_value_t, int> memories;
+valuechart_t rootchart, nowchart;
+
+ostringstream oss;
+
+int main(int argc, const char *argv[])
+{
+  ops['+'] = "add";
+  ops['-'] = "sub";
+  ops['*'] = "mul";
+  ops['/'] = "div";
+  ops['%'] = "mod";
+  doubleops["=="] = "eq";
+  doubleops["!="] = "ne";
+  doubleops[">"] = "gt";
+  doubleops["<"] = "lt";
+  doubleops[">="] = "ge";
+  doubleops["<="] = "le";
+  //  解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
+  //  compiler 模式 输入文件 -o 输出文件
   assert(argc == 5);
-  ofstream ofs(argv[4]);
-  ofs << generator[argv[1][1]];
+  auto mode = argv[1];
+  auto input = argv[2];
+  auto output = argv[4];
+
+  // 打开输入文件, 并且指定 lexer 在解析的时候读取这个文件
+  yyin = fopen(input, "r");
+  assert(yyin);
+
+  // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
+  unique_ptr<BaseAST> ast;
+  auto ret = yyparse(ast);
+  assert(!ret);
+  ast->Dump();
+  string Mystr = oss.str();
+  if (!strcmp(mode, "-riscv"))
+  {
+    freopen(output, "w", stdout);
+    const char *myStr = Mystr.c_str();
+    koopa_program_process(myStr);
+  }
+  else if (!strcmp(mode, "-koopa"))
+  {
+    freopen(output, "w", stdout);
+    cout << Mystr;
+  }
+  else
+  {
+    cout << "unspecified type" << endl;
+    assert(false);
+  }
+  // 输出解析得到的 AST, 其实就是个字符串
   return 0;
 }

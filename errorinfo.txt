@@ -1,0 +1,33 @@
+mkdir -p /root/compiler/build/
+clang++ -I/root/compiler/src -I/root/compiler/build -MMD -MP -Wall -Wno-register -std=c++17 -g -O0 -I/opt/include -c /root/compiler/src/main.cpp -o /root/compiler/build/main.cpp.o
+In file included from /root/compiler/src/main.cpp:7:
+/root/compiler/src/BaseAST.hpp:143:54: error: binding reference of type 'basic_string<...>' to value of type 'const basic_string<...>' drops 'const' qualifier
+                auto &tmp_t = nowchart->ident_search(lval);
+                                                     ^~~~
+/root/compiler/src/BaseAST.hpp:25:43: note: passing argument to parameter 'ident' here
+    valuechart *ident_search(std::string &ident)
+                                          ^
+/root/compiler/src/BaseAST.hpp:152:26: error: redefinition of 'tmp'
+                    auto tmp = tmp.chart;
+                         ^
+/root/compiler/src/BaseAST.hpp:151:27: note: previous definition is here
+                    auto &tmp = *tmp_t;
+                          ^
+/root/compiler/src/BaseAST.hpp:622:53: error: binding reference of type 'basic_string<...>' to value of type 'const basic_string<...>' drops 'const' qualifier
+                auto tmp_t = nowchart->ident_search(lval);
+                                                    ^~~~
+/root/compiler/src/BaseAST.hpp:25:43: note: passing argument to parameter 'ident' here
+    valuechart *ident_search(std::string &ident)
+                                          ^
+/root/compiler/src/BaseAST.hpp:668:53: error: binding reference of type 'basic_string<...>' to value of type 'const basic_string<...>' drops 'const' qualifier
+                auto tmp_t = nowchart->ident_search(lval);
+                                                    ^~~~
+/root/compiler/src/BaseAST.hpp:25:43: note: passing argument to parameter 'ident' here
+    valuechart *ident_search(std::string &ident)
+                                          ^
+/root/compiler/src/BaseAST.hpp:738:16: error: member reference type 'std::unordered_map<std::basic_string<char>, Mytype>' is not a pointer; did you mean to use '.'?
+        if (tmp->count(ident)) //如果在同一层已经定义过
+            ~~~^~
+               .
+5 errors generated.
+make: *** [Makefile:83: /root/compiler/build/main.cpp.o] Error 1
