@@ -7,12 +7,11 @@ int main() {
 //   }
 //   a = a + 5;
    int a = 1;
-  if(a == 1) {
-	a = 2;
-	int b = 3;
-	b = b + a * 2;
-  } else {
-	a = 3;
-  }
+   int b = 233;
+   {
+	int b = 5;
+	b = a * 2 + 3;
+   }
+ a = a * 5 + b;
   return a * 2;
 }

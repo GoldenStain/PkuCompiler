@@ -59,9 +59,11 @@ extern int yydebug;
   {
     RETURN = 258,
     CONST = 259,
-    IDENT = 260,
-    BTYPE = 261,
-    INT_CONST = 262
+    IF = 260,
+    ELSE = 261,
+    IDENT = 262,
+    BTYPE = 263,
+    INT_CONST = 264
   };
 #endif
 
@@ -76,7 +78,7 @@ union YYSTYPE
   BaseAST *ast_val;
   std::vector<std::unique_ptr<BaseAST>> *vec_val;
 
-#line 80 "/root/compiler/build/sysy.tab.hpp"
+#line 82 "/root/compiler/build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

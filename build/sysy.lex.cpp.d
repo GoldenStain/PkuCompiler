@@ -1,8 +1,6 @@
-/share/sysy-make-template/build/sysy.lex.cpp.o: \
-  /share/sysy-make-template/build/sysy.lex.cpp \
-  /share/sysy-make-template/src/BaseAST.hpp \
-  /share/sysy-make-template/build/sysy.tab.hpp
+/root/compiler/build/sysy.lex.cpp.o: /root/compiler/build/sysy.lex.cpp \
+  /root/compiler/src/BaseAST.hpp /root/compiler/build/sysy.tab.hpp
 
-/share/sysy-make-template/src/BaseAST.hpp:
+/root/compiler/src/BaseAST.hpp:
 
-/share/sysy-make-template/build/sysy.tab.hpp:
+/root/compiler/build/sysy.tab.hpp:

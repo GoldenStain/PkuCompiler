@@ -1,6 +1,17 @@
 fun @main(): i32 { 
 %entry:
-@a_5 = alloc i32
-store 100, @a_5
-ret 1
+@a_1 = alloc i32
+store 1, @a_1
+%0 = load @a_1
+%1 = eq %0, 1
+br%1, %then, %else
+%then:
+store 2, @a_1
+jump %end
+%else:
+store 3, @a_1
+jump %end
+%end:
+%2 = load @a_1
+ret %2
 }

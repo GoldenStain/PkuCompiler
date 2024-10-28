@@ -6,7 +6,6 @@
 #include <sstream>
 #include "BaseAST.hpp"
 #include "IRBuild.hpp"
-using namespace std;
 
 // 声明 lexer 的输入, 以及 parser 函数
 // 为什么不引用 sysy.tab.hpp 呢? 因为首先里面没有 yyin 的定义
@@ -19,12 +18,12 @@ int cnt, rootnum;
 int function_memory, moffset;
 bool is_const_exp;
 
-unordered_map<char, string> ops;
-unordered_map<string, string> doubleops;
-unordered_map<koopa_raw_value_t, int> memories;
+std::unordered_map<char, string> ops;
+std::unordered_map<string, string> doubleops;
+std::unordered_map<koopa_raw_value_t, int> memories;
 valuechart_t rootchart, nowchart;
 
-ostringstream oss;
+std::ostringstream oss;
 
 int main(int argc, const char *argv[])
 {
@@ -51,11 +50,11 @@ int main(int argc, const char *argv[])
   assert(yyin);
 
   // 调用 parser 函数, parser 函数会进一步调用 lexer 解析输入文件的
-  unique_ptr<BaseAST> ast;
+  std::unique_ptr<BaseAST> ast;
   auto ret = yyparse(ast);
   assert(!ret);
   ast->Dump();
-  string Mystr = oss.str();
+  std::string Mystr = oss.str();
   if (!strcmp(mode, "-riscv"))
   {
     freopen(output, "w", stdout);
@@ -65,11 +64,11 @@ int main(int argc, const char *argv[])
   else if (!strcmp(mode, "-koopa"))
   {
     freopen(output, "w", stdout);
-    cout << Mystr;
+    std::cout << Mystr;
   }
   else
   {
-    cout << "unspecified type" << endl;
+    std::cout << "unspecified type" << endl;
     assert(false);
   }
   // 输出解析得到的 AST, 其实就是个字符串
